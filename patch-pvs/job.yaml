@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pv-patcher-job
+  namespace: default
+spec:
+  ttlSecondsAfterFinished: 150
+  template:
+    spec:
+      serviceAccountName: pv-patcher-sa
+      containers:
+      - name: kubectl
+        image: bitnami/kubectl:1.30.7
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Starting PV patching job"
+          for pv in $(kubectl get pv -o name); do
+            echo "Patching $pv"
+            kubectl patch $pv -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+          done
+          echo "PV patching job completed"
+      restartPolicy: Never
+  backoffLimit: 4

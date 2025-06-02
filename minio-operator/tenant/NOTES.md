@@ -99,14 +99,82 @@ local-minio   Available   10s              21m   true
 
 ❯ kubectl -n velero describe backupstoragelocation local-minio
 
-kubectl -n velero run test-s3 \                                                                                                                             ─╯
-  --restart=Never \
+kubectl -n velero run test-s3 --restart=Never \
   --image=bitnami/aws-cli:2.15.0 \
   --env="AWS_ACCESS_KEY_ID=minio" \
   --env="AWS_SECRET_ACCESS_KEY=minio123" \
   --command -- /bin/sh -c 'sleep 3600'
 
-k exec -n velero -it test-s3 -- /bin/sh                                                                                                                     ─╯
+k exec -n velero -it test-s3 -- /bin/sh
   # $ aws --endpoint-url http://minio.minio-tenant.svc.cluster.local:80 s3 ls
     # 2025-06-01 20:02:46 velero
+  # $ aws --endpoint-url http://minio.minio-tenant.svc.cluster.local:80 s3 ls s3://velero/backups/nginx-backup/
+
+k apply -f with-pv.yaml 
+
+velero backup create nginx-backup --selector app=nginx -oyaml
+```
+
+```yaml
+❯ cat bakup-nginx.yaml
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: nginx-backup
+  namespace: velero
+spec:
+  includedNamespaces:
+  - '*'
+  storageLocation: local-minio
+  labelSelector:
+    matchLabels:
+      app: nginx
+  metadata: {}
+  ttl: 720h0m0s
+status: {}
+```
+
+```bash
+# testing backup
+k get pv -n nginx-example                                                                                                ─╯
+NAME                                       CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                 STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+pvc-32e4d535-e5c3-4fcd-867b-727275f47229   50Mi       RWO            Delete           Bound    nginx-example/nginx-logs              longhorn       <unset>                          117m
+pvc-92133d0b-f3be-4fcc-9fef-f3e8ed26f30b   10Gi       RWO            Delete           Bound    minio-tenant/data0-myminio-pool-0-0   longhorn       <unset>                          18h
+
+curl 192.168.1.31:30180                                                                                                  ─╯
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+
+velero backup create nginx-backup --selector app=nginx -oyaml > backup-nginx.yaml
+
+velero restore create --from-backup nginx-backup -oyaml > restore-nginx.yaml
+
+❯ k get restore -n velero
+NAME                          AGE
+nginx-backup-20250601205832   24s
+
+
 ```

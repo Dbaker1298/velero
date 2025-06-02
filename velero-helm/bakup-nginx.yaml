@@ -1,0 +1,16 @@
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: nginx-backup
+  namespace: velero
+spec:
+  includedNamespaces:
+  - '*'
+  storageLocation: local-minio
+  labelSelector:
+    matchLabels:
+      app: nginx
+  metadata: {}
+  ttl: 720h0m0s
+status: {}
+

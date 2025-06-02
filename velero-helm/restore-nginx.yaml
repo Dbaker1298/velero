@@ -1,0 +1,15 @@
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  creationTimestamp: null
+  name: nginx-backup-20250601205832
+  namespace: velero
+spec:
+  backupName: nginx-backup
+  hooks: {}
+  includedNamespaces:
+  - '*'
+  itemOperationTimeout: 0s
+  uploaderConfig: {}
+status: {}
+

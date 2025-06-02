@@ -1,3 +1,14 @@
+# Configure the dnsPolicy of the Velero deployment
+# See: https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-s-dns-policy
+dnsPolicy: "None"
+dnsConfig:
+  nameservers:
+    - 10.43.0.10
+  searches:
+    - velero.svc.cluster.local
+    - svc.cluster.local
+    - cluster.local
+
 # Init containers to add to the Velero deployment's pod spec. At least one plugin provider image is required.
 # If the value is a string then it is evaluated as a template.
 initContainers:

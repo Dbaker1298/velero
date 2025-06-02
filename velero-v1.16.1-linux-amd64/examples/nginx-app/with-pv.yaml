@@ -30,7 +30,7 @@ metadata:
     app: nginx
 spec:
   # Optional:
-  # storageClassName: <YOUR_STORAGE_CLASS_NAME>
+  storageClassName: longhorn
   accessModes:
     - ReadWriteOnce
   resources:
@@ -99,4 +99,4 @@ spec:
     targetPort: 80
   selector:
     app: nginx
-  type: LoadBalancer
+  type: NodePort
