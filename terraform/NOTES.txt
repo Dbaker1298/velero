@@ -12,3 +12,17 @@ aws --endpoint-url http://192.168.1.30:30080 s3api list-buckets
 aws --endpoint-url http://192.168.1.30:30080 s3 ls s3://minio-tf-state/
 
 aws --endpoint-url http://192.168.1.30:30080 s3 ls s3://minio-tf-state/state/
+
+{
+  curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.20.0/terraform-docs-v0.20.0-$(uname)-amd64.tar.gz
+tar -xzf terraform-docs.tar.gz
+chmod +x terraform-docs
+mv terraform-docs /usr/local/bin/terraform-docs
+}
+
+https://github.com/terraform-docs/terraform-docs
+https://terraform-docs.io/user-guide/configuration/output/
+
+terraform-docs markdown table --output-file README.md .
+
+TODO: pre-commit hooks
