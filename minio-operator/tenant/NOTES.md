@@ -33,6 +33,10 @@ mc ls local-minio/
 AWS_ACCESS_KEY_ID=minio AWS_SECRET_ACCESS_KEY=minio123 \                                                             ─╯
   aws --endpoint-url http://127.0.0.1:9000 s3api list-buckets
 
+AWS_ACCESS_KEY_ID=minio AWS_SECRET_ACCESS_KEY=minio123 aws --endpoint-url http://192.168.1.30:30080 s3api create-bucket --bucket minio-tf-state
+
+AWS_ACCESS_KEY_ID=minio AWS_SECRET_ACCESS_KEY=minio123 aws --endpoint-url http://192.168.1.30:30080 s3api list-buckets
+
 From inside the cluster, any Pod can reach MinIO’s S3 API at:
 
 http://minio.minio-tenant.svc.cluster.local:80

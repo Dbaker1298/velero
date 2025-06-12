@@ -4,7 +4,7 @@ metadata:
   name: pv-patcher-job
   namespace: default
 spec:
-  ttlSecondsAfterFinished: 150
+  ttlSecondsAfterFinished: 172800  # 2 days in seconds
   template:
     spec:
       serviceAccountName: pv-patcher-sa
@@ -16,10 +16,18 @@ spec:
         - -c
         - |
           echo "Starting PV patching job"
-          for pv in $(kubectl get pv -o name); do
+
+          kubectl get pv -o name | while read -r pv; do
             echo "Patching $pv"
-            kubectl patch $pv -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'
+            if kubectl patch "$pv" -p '{"spec":{"persistentVolumeReclaimPolicy":"Retain"}}'; then
+              echo "Patch successful for $pv"
+              policy=$(kubectl get "$pv" -o jsonpath='{.spec.persistentVolumeReclaimPolicy}')
+              echo "$pv new persistentVolumeReclaimPolicy: $policy"
+            else
+              echo "Failed to patch $pv"
+            fi
           done
+
           echo "PV patching job completed"
       restartPolicy: Never
   backoffLimit: 4

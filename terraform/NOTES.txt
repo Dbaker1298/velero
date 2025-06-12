@@ -1,0 +1,14 @@
+export AWS_ACCESS_KEY_ID="<your-minio-access-key>"
+export AWS_SECRET_ACCESS_KEY="<your-minio-secret-key>"
+
+terraform fmt -recursive
+
+terraform init
+
+terraform validate
+
+aws --endpoint-url http://192.168.1.30:30080 s3api list-buckets
+
+aws --endpoint-url http://192.168.1.30:30080 s3 ls s3://minio-tf-state/
+
+aws --endpoint-url http://192.168.1.30:30080 s3 ls s3://minio-tf-state/state/

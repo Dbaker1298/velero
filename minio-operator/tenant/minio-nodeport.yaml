@@ -1,0 +1,16 @@
+# minio-nodeport.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-nodeport
+  namespace: minio-tenant
+spec:
+  type: NodePort
+  selector:
+    v1.min.io/tenant: myminio
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: http-minio
+      nodePort: 30080  # You can choose any port in the 30000-32767 range
